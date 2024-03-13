@@ -1,0 +1,88 @@
+{smcl}
+{* 15nov2018}{...}
+{cmd:help trajstart}
+{marker s_Description}
+{title:Description}
+
+{p 4 4 6}{cmd:trajstart}: generate random start values for traj{p_end}
+
+{p 4 4 6}(NOTE: trajstart does not currently work with the joint trajectory model){p_end}
+
+{title:Examples}
+
+    1:{help trajstart##s_1:  Multi-trajectory model}               
+    2.{help trajstart##s_2:  Censored Normal Model with Risk}                 
+{hline}
+{marker s_Syntax}
+{title:Syntax}
+
+{p 6 8 6}
+{cmdab:trajstart} {cmd:, start(}{help matrix:{it:matrix}}{cmd:) sigma(#) groups(#) risk} {p_end} 
+{synoptset 20 tabbed}{...}
+{synopthdr}
+{synoptline}
+{syntab:Trajectory Variables}
+{synopt :{opt start(matrix)}}name of the matrix with the initial start values to be changed{p_end}
+{synopt :{opt sigma(#)}}amount of variability for the new random start values{p_end}
+{synopt :{opt groups(#)}}number of groups in the traj model (not required with risk option){p_end}
+{synopt :{opt risk}}optional to specify that the traj model includes risk variables{p_end}
+
+{hline}
+{marker s_1}
+{title:Example 1: Multi-Trajectory Model}
+
+{p 4 10 8}{stata "use http://www.andrew.cmu.edu/user/bjones/traj/data/montreal_sim.dta, clear"}{p_end}
+
+{p 4 10 8}{stata "traj, multgroups(3) var1(qcp84op-qcp91op) indep1(age1-age5) model1(cnorm) max1(10) order1(2 2 2) var2(qas*det) indep2(age3-age7) model2(zip) order2(2 0 3) detail"}{p_end}
+
+{p 4 10 8}{stata "mat sv = -.73, 0, 0, .99, 0, 0, 2.71, 0, 0, 1.72, -3, 0, 0, -.22, .85, 0, 0, 0, 33.3, 33.3, 33.3"}{p_end}
+
+{p 4 10 8}{stata `"trajstart, start(sv) sigma(.002) groups(3)"'}{p_end}
+
+{p 4 10 8}{stata `"mat A = r(trajstart)"'}{p_end}
+
+{p 4 10 8}{stata `"mat list A, format(%8.3f)"'}{p_end}
+
+{p 4 10 8}{stata "traj, multgroups(3) var1(qcp84op-qcp91op) indep1(age1-age5) model1(cnorm) max1(10) order1(2 2 2) var2(qas*det) indep2(age3-age7) model2(zip) order2(2 0 3) start(A) detail"}{p_end}
+
+{marker s_2}
+{title:Example 2: Censored Normal Model with Risk}
+
+{p 4 10 8}{stata "use http://www.andrew.cmu.edu/user/bjones/traj/data/montreal_sim.dta, clear"}{p_end}
+
+{p 4 10 8}{stata "traj, var(qcp*op) indep(age*) model(cnorm) min(0) max(10) order(1 3 2) risk(scolmer scolper) detail"}{p_end}
+
+{p 4 10 8}{stata "mat sv = -.24, 0, 2.24, 0, 0, 0, 4.72, 0, 0, 2.48, 0, 0, 0, 0, 0, 0"}{p_end}
+
+{p 4 10 8}{stata `"trajstart, start(sv) sigma(.01) risk"'}{p_end}
+
+{p 4 10 8}{stata `"mat A = r(trajstart)"'}{p_end}
+
+{p 4 10 8}{stata `"mat list A, format(%8.3f)"'}{p_end}
+
+{p 4 10 8}{stata "traj, var(qcp*op) indep(age*) model(cnorm) min(0) max(10) order(1 3 2) risk(scolmer scolper) start(A) detail"}{p_end}
+
+{hline}
+
+{marker saved_results}{...}
+{title:Saved results}
+
+{pstd}
+{cmd:trajstart} saves the following in {cmd:r()}:
+
+{synoptset 19 tabbed}{...}
+{p2col 5 19 23 2: Matrices}{p_end}
+{synopt:{cmd:r(trajstart)}}start vector{p_end}
+
+{hline}
+
+{title:Author}
+
+{p 4 4 6}Bobby L. Jones{p_end}
+{p 4 4 6}bjones@andrew.cmu.edu{p_end}
+
+{title:Web-page}
+
+{p 4 4 6} {browse "http://www.andrew.cmu.edu/user/bjones/"} {p_end}
+
+{smcl}

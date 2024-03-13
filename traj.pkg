@@ -1,0 +1,37 @@
+v 3
+d traj. Group-Based Modeling of Longitudinal Data
+d
+d {bf: Bobby L. Jones, University of Pittsburgh Medical Center}
+d
+d {bf: Daniel S. Nagin, Carnegie Mellon University}
+d
+d
+d Support: bobbyljones@gmail.com
+d Distribution-Date: 13mar2024
+g WIN			plug-ins/win/traj.plugin
+g WIN64A		plug-ins/win64a/traj.plugin
+g MAC			plug-ins/mac/traj.plugin
+g MACARM64		plug-ins/macarm64/traj.plugin
+g MACINTEL		plug-ins/mac/traj.plugin
+g MACINTEL64	plug-ins/mac/traj.plugin
+g LINUX			plug-ins/linux/traj.plugin
+g LINUX64		plug-ins/linux64/traj.plugin
+h traj.plugin
+f traj.ado
+h traj.ado
+f trajentropy.ado
+h trajentropy.ado
+f trajplot.ado
+h trajplot.ado
+f trajstart.ado
+h trajstart.ado
+f multtrajplot.ado
+h multtrajplot.ado
+f traj.hlp
+h traj.hlp
+f trajplot.hlp
+h trajplot.hlp
+f trajstart.hlp
+h trajstart.hlp
+f multtrajplot.hlp
+h multtrajplot.hlp

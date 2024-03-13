@@ -1,0 +1,33 @@
+{smcl}
+{* 22feb2017}{...}
+{cmd:help trajplot}
+{hline}
+
+{marker s_Description}
+{title:Description}
+
+{p 4 4 6}
+{cmd:trajplot} supports plotting of the {help traj} model results.
+
+{hline}
+
+{marker s_Syntax}
+{title:Syntax}
+
+{p 6 8 6}
+{cmdab:trajplot} [{cmd:,} {it:options}] {p_end} 
+
+{synoptset 20 tabbed}{...}
+{synopthdr}
+{synoptline}
+{synopt :{opt xtitle(xtitle)}}text for x-axis{p_end}
+{synopt :{opt ytitle(ytitle)}}text for y-axis{p_end}
+{synopt :{opt xlabel(xlabel)}}x-axis control, see {help axis_label_options}{p_end}
+{synopt :{opt ylabel(ylabel)}}y-axis control, see {help axis_label_options}{p_end}
+{synopt :{opt ci}}include 95% confidence intervals{p_end}
+{synopt :{opt dropout}}plot dropout probabilities{p_end}
+{synopt :{opt nolegend}}suppress legend on plot{p_end}
+{synopt :{opt noaverages}}suppress data averages on plot{p_end}
+{synopt :{opt legendOpts(legend options)}} these are legend options that are passed through to Stata for additional control over the trajplot legend, see {help legend_options} for details and {help traj} for a few examples.{p_end}
+
+{smcl}

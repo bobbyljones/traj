@@ -1,0 +1,7 @@
+v 3
+d Group-Based Modeling of Longitudinal Data
+d Bobby L. Jones, University of Pittsburgh Medical Center
+d Daniel S. Nagin, Carnegie Mellon University
+d
+d Also see the homepage for the papers illustrating the method.
+p traj Group Based Modeling of Longitudinal Data

@@ -1,0 +1,388 @@
+{smcl}
+{*04Dec2023}{...}
+{cmd:help traj}
+{hline}
+
+{p 4 4 6}{hi: traj}: Trajectory modeling{p_end}
+{p 4 4 6}{hi: {help trajplot}}: Plot results{p_end}
+{p 4 4 6}{hi: {help multtrajplot}}: Plot multi-trajectory model results{p_end}
+{p 4 4 6}{hi: {help trajstart}}: Generate random start values{p_end}
+{marker s_Description}
+{title:Description}
+
+{p 4 4 6}
+{cmd:traj} uses a discrete mixture model to model longitudinal data. This model accommodates data
+groups with different parameter values for each group distribution. Groupings may identify
+distinct subpopulations. Alternatively, groupings may represent components of an approximation to an
+unknown and possibly complex data distribution.{p_end}
+
+{hline}
+
+{title:Examples}
+
+1.{help traj##s_1:  Censored normal (cnorm) model}
+
+2.{help traj##s_2:  Variability (sigma) by group option - cnorm model}
+
+3.{help traj##s_3:  Zero-inflated Poisson (zip) model}
+
+4.{help traj##s_4:  Logistic (logit) model}
+
+5.{help traj##s_5:  Providing start values}
+
+6.{help traj##s_6:  Including time-stable covariates (risk) associated with group membership}
+
+7.{help traj##s_7:  Obtaining group membership probabilities from a model with risk variables}
+
+8.{help traj##s_8:  Including covariates (tcov), specified at each time point, associated with group trajectory means}
+
+9.{help traj##s_9:  Parametric bootstrap sampling for model parameters e.g. group size confidence intervals}
+
+10.{help traj##s_10: Wald hypothesis tests of the traj model parameters (like SAS %trajtest)}
+
+11.{help traj##s_11: Distal outcome model}
+
+12.{help traj##s_12: Distal outcome model with CI for individual outcome predictions}
+
+13.{help traj##s_13: Joint trajectory model}
+
+14.{help traj##s_14: Multi-trajectory model}
+
+15.{help traj##s_15: Dropout modeling}
+
+16.{help traj##s_16: Exposure time / sample weights}
+
+17.{help traj##s_17: Out of sample / holdout validation}
+
+18.{help traj##s_18: Beta (beta) model}
+
+19.{help traj##s_19: Sequential group membership probability model (probupdates)}
+
+{hline}
+{marker s_Syntax}
+{title:Syntax}
+
+{p 6 8 6}
+{cmdab:traj} [{help if:{it:if}}]{cmd:, var(}{help varlist:{it:varlist}}{cmd:) indep(}{help varlist:{it:varlist}}{cmd:) model(}{it:modeltype}{cmd:) order(}{help numlist:{it:numlist}}{cmd:)} [additional options] {p_end}
+
+{synoptset 20 tabbed}{...}
+{synopthdr}
+{synoptline}
+{syntab:Trajectory Variables}
+{synopt :{opt var(varlist)}}dependent variables, measured at different times or ages{p_end}
+{synopt :{opt indep(varlist)}}independent variables i.e. when the dependant variables were measured{p_end}
+
+{syntab:Model}
+{synopt :{opt model(modeltype)}}{opt beta}, {opt cnorm} (censored normal, normal), {opt logit}, {opt zip} 
+(zero-inflated Poisson, Poisson) - probability distribution for the dependent variables{p_end}
+{synopt :{opt order(numlist)}}{opt 0=intercept, 1=linear, 2=quadratic, 3=cubic, 4-quartic, 5-quintic} - polynomial type for each group trajectory{p_end}
+{synopt :{opt min(#)}}(cnorm, defaults to 0) minimum value for the censored normal model{p_end}
+{synopt :{opt max(#)}}(required for cnorm) maximum value for the censored normal model{p_end}
+{synopt :{opt sigmabygroup}}(cnorm) fit group specific sigma parameters{p_end}
+{synopt :{opt iorder(numlist)}}optional polynomial type (0=intercept, 1=linear, 2=quadratic, 3=cubic) for the zero-inflation of each group{p_end}
+{synopt :{opt exposure(varlist)}}optional exposure variables for the zero-inflated Poisson model{p_end}
+{synopt :{opt weight(varname)}}optional sampling weight variable{p_end}
+{synopt :{opt outofsample(varname)}}optional variable = 0 for data used in modeling and = 1 for out of sample cases heldout from the model.
+Posterior probabilities and group assignments are calculated for all data including the holdout cases.  
+{p_end}
+
+{syntab:Time-Stable Covariates for Group Membership}
+{synopt :{opt risk(varlist)}}covariates for the probability of group membership{p_end}
+{synopt :{opt refgroup(#)}}controls the reference group (default = 1) when the risk option is used{p_end}
+
+{syntab:Time-Varying Covariates Influencing Trajectory Paths}
+{synopt :{opt tcov(varlist)}}time-varying covariates for each group trajectory{p_end}
+{synopt :{opt plottcov(matrix)}}optional values for plotting trajectories with time-varying covariates{p_end}
+
+{syntab:Dropout Model}
+{synopt :{opt dropout(numlist)}}include logistic model of dropout probability per wave with 0 = constant rate,
+1 = depends on the previous response, 2 = depends on the two previous responses, for each group{p_end}
+{synopt :{opt dcov(varlist)}}optional lagged time-varying covariates for the dropout model{p_end}
+{synopt :{opt obsmar(varname)}}optional binary variable to mark which observations are to be included
+in the dropout model and those to be treated as missing at random. This variable = 1 for observations to
+be treated as data MAR (include completers) and = 0 for observations to be used for the modeled dropout{p_end}
+
+{syntab:Distal Outcome Model}
+{synopt :{opt outcome(varname)}}a distal variable to be regressed on the probability of group membership{p_end}
+{synopt :{opt omodel(modeltype)}}probability distribution for the outcome variable: {opt normal}, {opt logit}, {opt mlogit}, or {opt poisson} {p_end}
+{synopt :{opt ocov(varlist)}}optional covariates for the outcome model{p_end}
+
+
+{syntab:Joint Trajectory Model}
+
+{syntab:The joint trajectory model uses the options shown above with a '2' suffix to specify the second model e.g.}
+{syntab:{opt model2(modeltype)} etc. See the {help traj##s_8:joint trajectory} example.}
+
+{syntab:Multi-Trajectory Model}
+
+{syntab:The multi-trajectory model uses the options shown above with a '2', '3', etc. (up to 6) suffix to specify the additional models. See the {help traj##s_13:multi-trajectory} example.}
+{synopt :{opt multrisk(varlist)}}covariates for the probability of multi-trajectory group membership{p_end}
+{synopt :{opt multgroups(#)}}the number of multi-trajectory groups for the multi-trajectory model (2 to 6).
+
+
+{syntab:Other}
+{synopt :{opt start(matrix)}}parameter start values to override default start values{p_end}
+{synopt :{opt detail}}shows start values, minimization iterations, and ending values for
+monitoring model fitting progress. The ending values can be useful as start values for future traj models.{p_end}
+{synopt :{opt ci}}confidence intervals of individual distal outcome and probability of group memberships using the method of Sison and Glaz (1995).{p_end}
+{hline}
+{marker s_1}
+{title:Example 1: Censored normal (cnorm) model}
+
+{p 4 10 8}{stata "use https://www.andrew.cmu.edu/user/bjones/traj/data/montreal_sim.dta, clear"}{p_end}
+
+{p 4 10 8}{stata "traj, var(qcp*op) indep(age*) model(cnorm) min(0) max(10) order(1 3 2)"}{p_end}
+
+{p 4 10 8}{stata `"trajplot, xtitle(Age) ytitle(Opposition) xlabel(6(1)15) ylabel(0(1)6)"'}{p_end}
+
+{p 4 10 8}/* Show the assigned groups and probabilties of group membership */{p_end}
+{p 4 10 8}{stata `"list _traj_Group - _traj_ProbG3 if _n < 3, ab(12)"'}{p_end}
+
+{p 4 10 8}/* trajT = x-axis, Avg# = data averages, Est# = model estimates */{p_end}
+{p 4 10 8}{stata `"matrix list e(plot1), format(%9.2f) noheader"'}{p_end}
+{marker s_2}
+{title:Example 2:  Sigma by group (cnorm) model}
+
+{p 4 10 8}{stata "use https://www.andrew.cmu.edu/user/bjones/traj/data/panss.dta, clear"}{p_end}
+
+{p 4 10 8}{stata "traj, var(p1-p6) indep(t1-t6) model(cnorm) min(-999) max(999) order(3 3 1) sigmabygroup detail"}{p_end}
+
+{p 4 10 8}{stata "trajplot, xtitle(Time (weeks)) ytitle(PANSS) ci"}{p_end}
+{marker s_3}
+{title:Example 3: Zero-inflated Poisson (zip) model}
+
+{p 4 10 8}{stata "use https://www.andrew.cmu.edu/user/bjones/traj/data/anag1.dta, clear"}{p_end}
+
+{p 4 10 8}{stata "traj, var(y*) indep(t*) model(zip) order(0 3 3) iorder(0 -1 0)"}{p_end}
+
+{p 4 10 8}/* t1-t11 were scaled from -1 to 1 to generate good default start values.    */{p_end}
+{p 4 10 8}/* The following Stata commands return the x-axis to the original time scale.*/{p_end}
+{p 4 10 8}{stata "mat P = e(plot1)"}{p_end}
+{p 4 10 8}{stata "svmat P, names(col)"}{p_end}
+{p 4 10 8}{stata "replace trajT = 10 * trajT + 40"}{p_end}
+
+{p 4 10 8}{stata `"trajplot, xtitle(Age) ytitle(Annual Conviction Rate) plotvars(trajT-U953) ci"'}{p_end}
+
+{p 4 10 8}{stata "drop trajT - U953"}{p_end}
+
+{p 4 10 8}/* Assigned group and probabilties of group membership */{p_end}
+{p 4 10 8}{stata `"list _traj_Group - _traj_ProbG3 if _n > 400, ab(12)"'}{p_end}
+{marker s_4}
+{title:Example 4: Logistic (logit) model}
+
+{p 4 10 8}{stata "use https://www.andrew.cmu.edu/user/bjones/traj/data/cambrdge.dta, clear"}{p_end}
+
+{p 4 10 8}{stata "traj, var(p1-p23) indep(tt1-tt23) model(logit) order(0 3 3)"}{p_end}
+
+{p 4 10 8}{stata `"trajplot, xtitle(Scaled Age) ytitle(Prevalence)"'}{p_end}
+
+{p 4 10 8}/* Assigned group and probabilties of group membership */{p_end}
+{p 4 10 8}{stata `"list _traj_Group - _traj_ProbG3 if _n > 400, ab(12)"'}{p_end}
+{marker s_5}
+{title:Example 5: Providing start values}
+
+{p 4 10 8}{stata "use https://www.andrew.cmu.edu/user/bjones/traj/data/cambrdge.dta, clear"}{p_end}
+
+{p 4 10 8}{stata "matrix strt = -5.5, -.79, .19, -2.8, -1.2, .4, -.05, -1.86, .89, 4.37, .09, 5.5, -7.9, 64.6, 22.4, 5.5, 7.5"}{p_end}
+
+{p 4 10 8}{stata "traj, var(x01-x23) indep(tt1-tt23) model(zip) order(0 2 0 2) iorder(-1 1 -1 2) start(strt)"}{p_end}
+
+{p 4 10 8}{stata `"trajplot, ytitle(Offense Counts) xtitle(Scaled Age)"'}{p_end}
+{marker s_6}
+{title:Example 6: Including time-stable covariates (risk) associated with group membership}
+
+{p 4 10 8}{stata "use https://www.andrew.cmu.edu/user/bjones/traj/data/montreal_sim.dta, clear"}{p_end}
+
+{p 4 10 8}{stata "traj, var(qcp*op) indep(age*) model(cnorm) min(0) max(10) order(1 3 2) risk(scolmer scolper)"}{p_end}
+
+{p 4 10 8}{stata `"trajplot, xtitle(Age) ytitle(Opposition)"'}{p_end}
+{marker s_7}
+{title:Example 7: Obtaining group membership probabilities from a model with risk variables}
+
+{p 4 10 8}{stata "use https://www.andrew.cmu.edu/user/bjones/traj/data/anag1.dta, clear"}{p_end}
+
+{p 4 10 8}{stata "matrix strt = -4.5, -1.8, -6.7, -8, -.57, .47, -1.4, .62, -.56, -1.53, -1.7, 0, 0, 0, 0, -1.8, 0, 0, 0, 0, -2.5, 0, 0, 0, 0"}{p_end}
+
+{p 4 10 8}{stata "traj, var(y*) indep(t*) model(zip) order(0 2 2 2) risk(lowiq crimpar daring pbeh) start(strt)"}{p_end}
+
+{p 4 10 8}/* Risk variable settings, assigned group and probabilties of group membership */{p_end}
+{p 4 10 8}{stata "list lowiq -  _traj_ProbG4 in 1/6, ab(12)"}{p_end}
+{marker s_8}
+{title:Example 8: Including time-varying covariates (tcov) associated with group trajectory shape}
+
+{p 4 10 8}{stata "use https://www.andrew.cmu.edu/user/bjones/traj/data/gang_data_sim.dta, clear"}{p_end}
+
+{p 4 10 8}{stata "matrix tc1 = 0, 0, 0, 0, 0, 0, 0"}{p_end}
+
+{p 4 10 8}{stata "matrix tc2 = 0, 0, 0, 1, 1, 1, 1"}{p_end}
+
+{p 4 10 8}{stata "traj, var(bat*) indep(t*) model(zip) order(2 2 2 2 2) tcov(gang*) plottcov(tc1)"}{p_end}
+
+{p 4 10 8}{stata `"trajplot, xtitle(Scaled Age) ytitle(Rate)"'}{p_end}
+
+{p 4 10 8}{stata "traj, var(bat*) indep(t*) model(zip) order(2 2 2 2 2) tcov(gang*) plottcov(tc2)"}{p_end}
+
+{p 4 10 8}{stata `"trajplot, xtitle(Scaled Age) ytitle(Rate)"'}{p_end}
+{marker s_9}
+{title:Example 9: Parametric bootstrap sampling for model parameters e.g. group size confidence intervals}
+
+{p 4 10 8}{stata "use https://www.andrew.cmu.edu/user/bjones/traj/data/montreal_sim.dta, clear"}{p_end}
+
+{p 4 10 8}{stata "keep if nbp14 == 2"}{p_end}
+
+{p 4 10 8}{stata "traj, model(cnorm) var(qcp*op) indep(age*) order(2 0) min(0) max(10) detail"}{p_end}
+
+{p 4 10 8}{stata "matrix strt = -6.61985, 1.54556, -.07869, 4.19167, 2.69570, 40.90389, 59.09611"}{p_end}
+
+{p 4 10 8}{stata "bootstrap _b (100/(1+exp(_b[theta2]))) (100*exp(_b[theta2])/(1+exp(_b[theta2]))), reps(1000) dots(10): traj, model(cnorm) var(qcp*op) indep(age*) order(2 0) min(0) max(10) start(strt) novar"}{p_end}
+
+{p 4 10 8}{stata "estat bootstrap, percentile bc"}{p_end}
+{marker s_10}
+{title:Example 10: Wald hypothesis tests of the traj model parameters (like SAS %trajtest)}
+
+{p 4 10 8}{stata "use https://www.andrew.cmu.edu/user/bjones/traj/data/anag1.dta, clear"}{p_end}
+
+{p 4 10 8}{stata "matrix strt = -4.5, -1.8, -6.7, -8, -.57, .47, -1.4, .62, -.56, -1.53, -1.7, 0, 0, 0, 0, -1.8, 0, 0, 0, 0, -2.5, 0, 0, 0, 0"}{p_end}
+
+{p 4 10 8}{stata "traj, var(y*) indep(t*) model(zip) order(0 2 2 2) risk(lowiq crimpar daring pbeh) start(strt)"}{p_end}
+
+{p 4 10 8}{stata "trajplot, ci"}{p_end}
+
+{p 4 10 8}/* List the parameter estimates to verify the names for testnl */{p_end}
+{p 4 10 8}{stata `"matrix list e(b), format(%8.3f)"'}{p_end}
+
+{p 4 10 8}{stata "testnl _b[lowiqG2] = _b[lowiqG3] = _b[lowiqG4]"}{p_end}
+{marker s_11}
+{title:Example 11: Distal outcome model}
+
+{p 4 10 8}{stata "use https://www.andrew.cmu.edu/user/bjones/traj/data/montreal_sim.dta, clear"}{p_end}
+
+{p 4 10 8}{stata "traj, var(qcp84op qcp88op qcp89op qcp90op qcp91op) indep(age1-age5) model(cnorm) max(10) order(1 2 2) outcome(bp14) omodel(logit)"}{p_end}
+{marker s_12}
+{title:Example 12: Distal outcome model with CI for individual outcome predictions}
+
+{p 4 10 8}{stata "use https://www.andrew.cmu.edu/user/bjones/traj/data/montreal_sim.dta, clear"}{p_end}
+
+{p 4 10 8}{stata "traj, var(qcp84op qcp88op qcp89op qcp90op qcp91op) indep(age1-age5) model(cnorm) max(10) order(1 2 2) outcome(bp14) omodel(logit) ci"}{p_end}
+
+{p 4 10 8}/* Observed outcome and 90% CI */{p_end}
+{p 4 10 8}{stata `"list _traj_Prob* if _n > 1030 & nbp14 != ., ab(18)"'}{p_end}
+
+{p 4 10 8}/* probabilities of group membership and 90% CIs */{p_end}
+{p 4 10 8}{stata `"list nbp14 _traj_Outcome* if _n > 1030 & nbp14 != ., ab(20)"'}{p_end}
+{marker s_13}
+{title:Example 13: Joint trajectory model}
+
+{p 4 10 8}{stata "use https://www.andrew.cmu.edu/user/bjones/traj/data/montreal_sim.dta, clear"}{p_end}
+
+{p 4 10 8}{stata "traj, var(qcp84op qcp88op qcp89op qcp90op qcp91op) indep(age1-age5) model(cnorm) max(10) order(1 2 2) var2(qas91det qas92det qas93det qas94det qas95det) indep2(age3-age7) model2(zip) order2(2 2 2 2)"}{p_end}
+
+{p 4 10 8}{stata `"trajplot, ytitle(Opposition) xtitle(Age)"'}{p_end}
+
+{p 4 10 8}{stata "trajplot, model(2) ytitle(Rate) xtitle(Age)"}{p_end}
+{marker s_14}
+{title:Example 14: Multi-trajectory model}
+
+{p 4 10 8}{stata "use https://www.andrew.cmu.edu/user/bjones/traj/data/montreal_sim.dta, clear"}{p_end}
+
+{p 4 10 8}{stata "traj, multgroups(3) var1(qcp84op-qcp91op) indep1(age1-age5) model1(cnorm) max1(10) order1(1 2 2) var2(qas*det) indep2(age3-age7) model2(zip) order2(2 1 2)  var3(qcp*bat) indep3(age*) model3(cnorm) max3(6) order3(1 2 1)"}{p_end}
+
+{p 4 10 8}{stata `"multtrajplot, xtitle(Age) ytitle1(Opposition) ytitle2(Rate) ytitle3(Aggression) ylabel1(0(2)6) ylabel2(0(1)4) ylabel3(0(1)3)"'}{p_end}
+{marker s_15}
+{title:Example 15: Dropout modeling}
+
+{p 4 10 8}{stata "use https://www.andrew.cmu.edu/user/bjones/traj/data/panss.dta, clear"}{p_end}
+
+{p 4 10 8}{stata "traj, var(p1-p6) indep(t1-t6) model(cnorm) min(-999) max(999) order(3 3 0) risk(risper) dropout(1 1 1) dcov(risper risper risper risper risper risper) sigmabygroup"}{p_end}
+
+{p 4 10 8}{stata "trajplot, xtitle(Time (weeks)) ytitle(PANSS) ylabel(40(20)120) ci"}{p_end}
+
+{p 4 10 8}{stata "trajplot, dropout xtitle(Time (weeks)) ytitle(Dropout probability) ylabel(0(.05).25)"}{p_end}
+{marker s_16}
+{title:Example 16: Exposure time / sample weights}
+
+{p 4 10 8}{stata "use https://www.andrew.cmu.edu/user/bjones/traj/data/weight_expos_sim.dta, clear"}{p_end}
+
+{p 4 10 8}{stata "traj, var(g2 - g13) indep(t*) model(zip) order(2 2) iorder(0 2) expos(e*) weight(wt50)"}{p_end}
+
+{p 4 10 8}{stata "trajplot, xtitle(Age) ytitle(Annual Arrest Rate)"}{p_end}
+{marker s_17}
+{title:Example 17: Out of sample / holdout validation}
+
+{p 4 10 8}{stata "use https://www.andrew.cmu.edu/user/bjones/traj/data/panss.dta, clear"}{p_end}
+
+{p 4 10 8}{stata "gen oos = 0"}{p_end}
+
+{p 4 10 8}{stata "replace oos = rbinomial(1,.2)"}{p_end}
+
+{p 4 10 8}{stata "traj, var(p1-p6) indep(t1-t6) model(cnorm) min(-999) max(999) order(3 3 1) risk(risper) dropout(1 1 1) dcov(risper risper risper risper risper risper) sigmabygroup outofsample(oos)"}{p_end}
+
+{p 4 10 8}{stata "list _traj_* if oos == 1, ab(12)"}{p_end}
+{marker s_18}
+{title:Example 18: Beta (beta) model}
+
+{p 4 10 8}{stata "use https://www.andrew.cmu.edu/user/bjones/traj/data/beta.dta, clear"}{p_end}
+
+{p 4 10 8}{stata "traj, var(sr*) indep(t*) model(beta) order(3 2 2)"}{p_end}
+
+{p 4 10 8}{stata "mat P = e(plot1)"}{p_end}
+{p 4 10 8}{stata "svmat P, names(col)"}{p_end}
+{p 4 10 8}{stata "replace trajT = 10 * trajT + 12.5"}{p_end}
+
+{p 4 10 8}{stata `"trajplot, xtitle(2-Hour Period) ytitle(Suppression Ratio) plotvars(trajT-U953) ylabel(0(.2)1) legendLabels(label(3 "High (n=121, 30.7%)") label(2 "Falling (n=164, 41.6%)") label(1 "Low (n=109, 27.7%)") size(small))"'}{p_end}
+
+{p 4 10 8}{stata "drop trajT-U953"}{p_end}
+
+{hline}
+
+{marker saved_results}{...}
+{title:Saved results}
+
+{pstd}
+{cmd:traj} saves the following in {cmd:e()}:
+
+{synoptset 19 tabbed}{...}
+{p2col 5 19 23 2: Scalars}{p_end}
+{synopt:{cmd:e(numGroups1)}}number of groups 1 (through 6 when generated){p_end}
+{synopt:{cmd:e(BIC_N_data)}}BIC based on the number of data points{p_end}
+{synopt:{cmd:e(BIC_n_subjects)}}BIC based on the number of subjects{p_end}
+{synopt:{cmd:e(AIC)}}AIC{p_end}
+{synopt:{cmd:e(ll)}}log likelihood{p_end}
+{synopt:{cmd:e(rc)}}return code{p_end}
+
+{synoptset 19 tabbed}{...}
+{p2col 5 17 21 2: Macros}{p_end}
+{synopt:{cmd:e(cmdline)}}command as typed{p_end}
+{synopt:{cmd:e(cmd)}}{cmd:traj}{p_end}
+{synopt:{cmd:e(properties)}}{cmd:b V}{p_end}
+
+{synoptset 19 tabbed}{...}
+{p2col 5 17 21 2: Matrices}{p_end}
+{synopt:{cmd:e(b)}}coefficient vector{p_end}
+{synopt:{cmd:e(V)}}variance-covariance matrix of the estimators{p_end}
+{synopt:{cmd:e(groupSize1)}}group sizes 1 (through 6 when generated){p_end}
+{synopt:{cmd:e(plot1)}}results for plotting 1 (through 6 when generated){p_end}
+
+{p2col 5 17 21 2: Functions}{p_end}
+{synopt:{cmd:e(sample)}}marks estimation sample{p_end}
+{p2colreset}{...}
+
+{hline}
+
+{title:Author}
+
+{p 4 4 6}Bobby L. Jones{p_end}
+{p 4 4 6}bjones@andrew.cmu.edu{p_end}
+
+{p 4 4 6}Daniel S. Nagin.{p_end}
+{p 4 4 6}dn03@andrew.cmu.edu{p_end}
+
+{title:Web-page}
+
+{p 4 4 6} {browse "https://www.andrew.cmu.edu/user/bjones/"} {p_end}
+
+{title:Please reference}
+
+{p 4 4 6}Jones BL, Nagin DS. A note on a Stata plugin for estimating group-based trajectory models. Sociological Methods & Research. 2013:608-613.{p_end}
+
+{smcl}

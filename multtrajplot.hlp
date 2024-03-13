@@ -1,0 +1,49 @@
+{smcl}
+{* 15nov2018}{...}
+{cmd:help multtrajplot}
+{hline}
+
+{marker s_Description}
+{title:Description}
+
+{p 4 4 6}
+{cmd:multtrajplot}: plot the {help traj} multi-trajectory model results{p_end} 
+{hline}
+
+{title:Example}
+
+{p 4 10 8}{stata "use http://www.andrew.cmu.edu/user/bjones/traj/data/montreal_sim.dta, clear"}{p_end}
+
+{p 4 10 8}{stata "traj, multgroups(3) var1(qcp84op-qcp91op) indep1(age1-age5) model1(cnorm) max1(10) order1(2 2) var2(qas*det) indep2(age3-age7) model2(zip) order2(2 2)  var3(qcp*bat) indep3(age*) model3(cnorm) max3(6) order3(1 2)"}{p_end}
+
+{p 4 10 8}{stata `"multtrajplot, xtitle(Age) ytitle1(Opposition) ytitle2(Rate) ytitle3(Aggression) ylabel1(0(2)6) ylabel2(0(1)4) ylabel3(0(1)3)"'}{p_end}
+{hline}
+
+{marker s_Syntax}
+{title:Syntax}
+
+{p 6 8 6}
+{cmdab:multtrajplot} [{cmd:,} {it:options}] {p_end} 
+
+{synoptset 20 tabbed}{...}
+{synopthdr}
+{synoptline}
+{synopt :{opt xtitle(xtitle)}}text for x-axis{p_end}
+{synopt :{opt ytitle1(ytitle)}}text for y-axis1{p_end}
+{synopt :{opt ytitle2(ytitle)}}text for y-axis2{p_end}
+{synopt :{opt ytitle3(ytitle)}}text for y-axis3{p_end}
+{synopt :{opt ytitle4(ytitle)}}text for y-axis4{p_end}
+{synopt :{opt ytitle5(ytitle)}}text for y-axis5{p_end}
+{synopt :{opt ytitle6(ytitle)}}text for y-axis6{p_end}
+{synopt :{opt xlabel(xlabel)}}x-axis control, see {help axis_label_options}{p_end}
+{synopt :{opt ylabel1(ylabel)}}y-axis1 control{p_end}
+{synopt :{opt ylabel2(ylabel)}}y-axis2 control{p_end}
+{synopt :{opt ylabel3(ylabel)}}y-axis3 control{p_end}
+{synopt :{opt ylabel4(ylabel)}}y-axis4 control{p_end}
+{synopt :{opt ylabel5(ylabel)}}y-axis5 control{p_end}
+{synopt :{opt ylabel6(ylabel)}}y-axis6 control{p_end}
+{synopt :{opt ci}}include 95% confidence intervals{p_end}
+{synopt :{opt noaverages}}exclude data averages{p_end}
+
+
+{smcl}
