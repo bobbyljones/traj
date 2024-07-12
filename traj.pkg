@@ -7,7 +7,7 @@ d {bf: Daniel S. Nagin, Carnegie Mellon University}
 d
 d
 d Support: bobbyljones@gmail.com
-d Distribution-Date: 8jul2024
+d Distribution-Date: 12jul2024
 g WIN			plug-ins/win/traj.plugin
 g WIN64A		plug-ins/win64a/traj.plugin
 g MAC			plug-ins/mac/traj.plugin
